@@ -1,52 +1,45 @@
-import type { Router as RemixRouter } from '@remix-run/router';
-import { useEffect } from 'react';
-import { createBrowserRouter, RouteObject, RouterProvider } from 'react-router-dom';
+import './App.css';
 
-import { categoryScreens } from './modules/category/routes';
-import { firstScreenRoutes } from './modules/firstScreen/routes';
-import { loginRoutes } from './modules/login/routes';
-import { orderScreens } from './modules/orders/routes';
-import { productScreens } from './modules/product/routes';
-import { userScreens } from './modules/user/routes';
-import { URL_USER } from './shared/constants/urls';
-import { MethodsEnum } from './shared/enums/methods.enum';
-import { getAuthorizationToken, verifyLoggedIn } from './shared/functions/connection/auth';
-import { useNotification } from './shared/hooks/useNotification';
-import { useRequests } from './shared/hooks/useRequests';
-import { useGlobalReducer } from './store/reducers/globalReducer/useGlobalReducer';
+import { Button } from 'antd';
+import { useState } from 'react';
+import styled from 'styled-components';
 
-const routes: RouteObject[] = [...loginRoutes];
-const routesLoggedIn: RouteObject[] = [
-  ...productScreens,
-  ...categoryScreens,
-  ...firstScreenRoutes,
-  ...userScreens,
-  ...orderScreens,
-].map((route) => ({
-  ...route,
-  loader: verifyLoggedIn,
-}));
-
-const router: RemixRouter = createBrowserRouter([...routes, ...routesLoggedIn]);
+import reactLogo from './assets/react.svg';
 
 function App() {
-  const { contextHolder } = useNotification();
-  const { setUser } = useGlobalReducer();
-  const { request } = useRequests();
-
-  useEffect(() => {
-    const token = getAuthorizationToken();
-    if (token) {
-      request(URL_USER, MethodsEnum.GET, setUser);
-    }
-  }, []);
+  const [count, setCount] = useState(0);
 
   return (
-    <>
-      {contextHolder}
-      <RouterProvider router={router} />
-    </>
+    <StyledLink isBlue={count > 4} className="App">
+      <div>
+        <a href="https://vitejs.dev" target="_blank" rel="noreferrer">
+          <img src="/vite.svg" className="logo" alt="Vite logo" />
+        </a>
+        <a href="https://reactjs.org" target="_blank" rel="noreferrer">
+          <img src={reactLogo} className="logo react" alt="React logo" />
+        </a>
+      </div>
+      <h1>Vite + React</h1>
+      <div className="card">
+        <Button type="primary" onClick={() => setCount((count) => count + 1)}>
+          count is {count}
+        </Button>
+        <p>
+          Edit <code>src/App.tsx</code> and save to test HMR
+        </p>
+      </div>
+      <p className="read-the-docs">Click on the Vite and React logos to learn more</p>
+    </StyledLink>
   );
 }
+
+interface PStyledLink {
+  isBlue?: boolean;
+}
+
+const StyledLink = styled.div<PStyledLink>`
+  color: ${(props) => (props.isBlue ? 'blue' : 'pink')};
+  font-weight: bold;
+`;
 
 export default App;
